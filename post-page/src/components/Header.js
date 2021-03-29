@@ -86,6 +86,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   position: fixed;
+  z-index: 10;
   top: 0;
   left: 0;
   padding: 20px;

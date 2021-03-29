@@ -1,5 +1,5 @@
 import { createAction, handleActions } from 'redux-actions';
-import { produce } from 'immer';
+import produce from 'immer';
 import { setCookie, deleteCookie } from '../../shared/Cookie';
 import { auth } from '../../shared/firebase';
 import firebase from 'firebase/app';
