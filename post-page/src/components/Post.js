@@ -35,6 +35,7 @@ const Container = styled.div`
   margin: 12px auto;
   display: flex;
   flex-direction: column;
+  border: 3px groove #eee;
 `;
 const Header = styled.div`
   display: flex;

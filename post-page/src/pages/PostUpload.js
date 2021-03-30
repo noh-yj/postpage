@@ -102,6 +102,7 @@ function PostUpload(props) {
         <Button
           variant='contained'
           onClick={() => {
+            dispatch(imageActions.preview(null));
             history.goBack();
           }}
         >

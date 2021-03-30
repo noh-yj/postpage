@@ -76,6 +76,7 @@ const editPostFB = (post_id = null, post = {}) => {
               insert_dt: moment().format('YYYY-MM-DD HH:mm:ss'),
             }),
           );
+          dispatch(imageActions.preview(null));
           history.replace('/');
         });
       return;
@@ -108,6 +109,7 @@ const editPostFB = (post_id = null, post = {}) => {
                     insert_dt: moment().format('YYYY-MM-DD HH:mm:ss'),
                   }),
                 );
+                dispatch(imageActions.preview(null));
                 history.replace('/');
               });
           })
@@ -150,7 +152,7 @@ const addPostFB = (comment = '') => {
               let post = {
                 user_info,
                 ..._post,
-                post_id: doc.id,
+                id: doc.id,
                 image_url: url,
               };
               dispatch(addPost(post));
@@ -216,7 +218,7 @@ const getPostFB = (start = null, size = 3) => {
           );
           post_list.push(post);
         });
-        post_list.pop();
+        // post_list.pop();
         dispatch(getPost(post_list, paging));
       });
   };
