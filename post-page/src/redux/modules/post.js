@@ -6,6 +6,8 @@ import { actionCreators as imageActions } from './image';
 
 const ADD_POST = 'ADD_POST';
 const GET_POST = 'GET_POST';
+const EDIT_POST = 'EDIT_POST';
+const DELETE_POST = 'DELETE_POST';
 const LOADING = 'LOADING';
 
 const addPost = createAction(ADD_POST, (post) => ({ post }));
@@ -13,6 +15,11 @@ const getPost = createAction(GET_POST, (post_list, paging) => ({
   post_list,
   paging,
 }));
+const editPost = createAction(EDIT_POST, (post_id, post) => ({
+  post_id,
+  post,
+}));
+const deletePost = createAction(DELETE_POST, (post_id) => ({ post_id }));
 const loading = createAction(LOADING, (is_loading) => ({ is_loading }));
 
 const initialState = {
@@ -24,7 +31,92 @@ const initialState = {
 const initialPost = {
   comment: '',
   like: 0,
-  insert_dt: moment().format('YYYY-MM-DD hh:mm:ss'),
+  insert_dt: moment().format('YYYY-MM-DD HH:mm:ss'),
+};
+
+const deletePostFB = (post_id = null) => {
+  return function (dispatch, getState, { history }) {
+    if (!post_id) {
+      return;
+    }
+    const postDB = firestore.collection('post');
+    postDB
+      .doc(post_id)
+      .delete()
+      .then((res) => {
+        dispatch(deletePost(post_id));
+        history.replace('/');
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+};
+
+const editPostFB = (post_id = null, post = {}) => {
+  return function (dispatch, getState, { history }) {
+    if (!post_id) {
+      return;
+    }
+    const _image = getState().image.preview;
+    const _post_idx = getState().post.list.findIndex(
+      (val) => val.id === post_id,
+    );
+    const _post = getState().post.list[_post_idx];
+
+    const postDB = firestore.collection('post');
+    if (_image === _post.image_url) {
+      postDB
+        .doc(post_id)
+        .update({ ...post, insert_dt: moment().format('YYYY-MM-DD HH:mm:ss') })
+        .then((doc) => {
+          dispatch(
+            editPost(post_id, {
+              ...post,
+              insert_dt: moment().format('YYYY-MM-DD HH:mm:ss'),
+            }),
+          );
+          history.replace('/');
+        });
+      return;
+    } else {
+      const user_id = getState().user.user.uid;
+      const _upload = storage
+        .ref(`image/${user_id}_${new Date().getTime()}`)
+        .putString(_image, 'data_url');
+
+      _upload.then((snapshot) => {
+        snapshot.ref
+          .getDownloadURL()
+          .then((url) => {
+            dispatch(imageActions.uploadImage(url));
+            return url;
+          })
+          .then((url) => {
+            postDB
+              .doc(post_id)
+              .update({
+                ...post,
+                image_url: url,
+                insert_dt: moment().format('YYYY-MM-DD HH:mm:ss'),
+              })
+              .then((doc) => {
+                dispatch(
+                  editPost(post_id, {
+                    ...post,
+                    image_url: url,
+                    insert_dt: moment().format('YYYY-MM-DD HH:mm:ss'),
+                  }),
+                );
+                history.replace('/');
+              });
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      });
+    }
+  };
 };
 
 const addPostFB = (comment = '') => {
@@ -38,7 +130,7 @@ const addPostFB = (comment = '') => {
     const _post = {
       ...initialPost,
       comment: comment,
-      insert_dt: moment().format('YYYY-MM-DD hh:mm:ss'),
+      insert_dt: moment().format('YYYY-MM-DD HH:mm:ss'),
     };
     const image = getState().image.preview;
     const upload = storage
@@ -124,7 +216,7 @@ const getPostFB = (start = null, size = 3) => {
           );
           post_list.push(post);
         });
-        // post_list.pop();
+        post_list.pop();
         dispatch(getPost(post_list, paging));
       });
   };
@@ -164,6 +256,7 @@ export default handleActions(
     [GET_POST]: (state, action) =>
       produce(state, (draft) => {
         draft.list.push(...action.payload.post_list);
+
         draft.list = draft.list.reduce((acc, cur) => {
           if (acc.findIndex((val) => val.id === cur.id) === -1) {
             return [...acc, cur];
@@ -172,11 +265,26 @@ export default handleActions(
             return acc;
           }
         }, []);
+
         if (action.payload.paging) {
           draft.paging = action.payload.paging;
         }
 
         draft.is_loading = false;
+      }),
+    [EDIT_POST]: (state, action) =>
+      produce(state, (draft) => {
+        let idx = draft.list.findIndex(
+          (val) => val.id === action.payload.post_id,
+        );
+        draft.list[idx] = { ...draft.list[idx], ...action.payload.post };
+      }),
+    [DELETE_POST]: (state, action) =>
+      produce(state, (draft) => {
+        let idx = draft.list.findIndex(
+          (val) => val.id === action.payload.post_id,
+        );
+        draft.list.splice(idx, 1);
       }),
     [LOADING]: (state, action) =>
       produce(state, (draft) => {
@@ -190,6 +298,8 @@ const actionCreators = {
   addPostFB,
   getPostFB,
   getPostOneFB,
+  editPostFB,
+  deletePostFB,
 };
 
 export { actionCreators };

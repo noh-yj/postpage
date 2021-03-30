@@ -89,7 +89,7 @@ function SignUp(props) {
           variant='contained'
           color='default'
           onClick={() => {
-            history.goBack();
+            history.replace('/');
           }}
         >
           뒤로가기

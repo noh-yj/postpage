@@ -35,6 +35,7 @@ function App() {
         <Route path='/login' exact component={Login} />
         <Route path='/signup' exact component={SignUp} />
         <Route path='/upload' exact component={PostUpload} />
+        <Route path='/edit/:id' exact component={PostUpload} />
         <Route path='/detail/:id' exact component={PostDetail} />
         <Route path='/' exact>
           <PostList />

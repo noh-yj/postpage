@@ -59,7 +59,7 @@ const Img = styled.img`
   height: 400px;
 `;
 const Like = styled.p`
-  padding: 4px 16px 4px 16px;
+  padding: 10px 16px 10px 16px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
