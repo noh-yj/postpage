@@ -13,12 +13,12 @@ function Post(props) {
             <Avatar>{props.user_info.user_name[0].toUpperCase()}</Avatar>
             <UserName>{props.user_info.user_name}</UserName>
           </UserInfo>
-
           <p>{props.insert_dt}</p>
         </Header>
-
-        <Comment>{props.comment}</Comment>
-        <Img src={props.image_url} alt='img' />
+        <Main>
+          <Comment>{props.comment}</Comment>
+          <Img src={props.image_url} alt='img' />
+        </Main>
         <LikeCnt>
           <Permit>
             <Like />
@@ -50,13 +50,23 @@ const UserInfo = styled.div`
 const UserName = styled.p`
   margin-left: 8px;
 `;
+const Main = styled.div`
+  display: flex;
+`;
 const Comment = styled.p`
-  padding: 4px 16px 4px 16px;
+  padding: 0px 16px 0px 16px;
+  margin: 0;
+  width: 100px;
+  height: 400px;
+  overflow: auto;
   word-wrap: break-word;
 `;
 const Img = styled.img`
-  width: 100%;
+  width: 350px;
   height: 400px;
+  @media only screen and (max-width: 375px) {
+    width: 250px;
+  }
 `;
 const LikeCnt = styled.p`
   padding: 10px 16px 10px 16px;

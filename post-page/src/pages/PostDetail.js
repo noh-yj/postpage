@@ -3,6 +3,8 @@ import Button from '@material-ui/core/Button';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import Post from '../components/Post';
+import Postb from '../components/Postb';
+import Postc from '../components/Postc';
 import { actionCreators as postActions } from '../redux/modules/post';
 
 function PostDetail(props) {
@@ -23,7 +25,13 @@ function PostDetail(props) {
 
   return (
     <>
-      {post && <Post {...post} />}
+      {post && post?.selectedValue === 'a' ? (
+        <Post {...post} />
+      ) : post?.selectedValue === 'b' ? (
+        <Postb {...post} />
+      ) : post?.selectedValue === 'c' ? (
+        <Postc {...post} />
+      ) : null}
 
       {post && user_info?.uid === post.user_info.user_id ? (
         <Container>

@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import Post from '../components/Post';
+import Postb from '../components/Postb';
+import Postc from '../components/Postc';
 import InfinityScroll from '../shared/InfinityScroll';
 import { history } from '../redux/configureStore';
 import { useDispatch, useSelector } from 'react-redux';
@@ -36,7 +38,13 @@ function PostList(props) {
               }}
               key={val.id}
             >
-              <Post {...val} />
+              {val.selectedValue === 'a' ? (
+                <Post {...val} />
+              ) : val.selectedValue === 'b' ? (
+                <Postb {...val} />
+              ) : val.selectedValue === 'c' ? (
+                <Postc {...val} />
+              ) : null}
             </Wrap>
           );
         })}

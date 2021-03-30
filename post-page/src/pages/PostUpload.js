@@ -3,6 +3,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import styled from 'styled-components';
 import BorderColorIcon from '@material-ui/icons/BorderColor';
+import Radio from '@material-ui/core/Radio';
 import Image from '../components/Image';
 import { useSelector, useDispatch } from 'react-redux';
 import { actionCreators as postActions } from '../redux/modules/post';
@@ -19,6 +20,7 @@ function PostUpload(props) {
 
   let _post = is_edit ? post_list.find((val) => val.id === post_id) : null;
   const [comment, setComment] = useState(_post ? _post.comment : '');
+  const [selectedValue, setSelectedValue] = useState('a');
 
   useEffect(() => {
     if (is_edit && !_post) {
@@ -38,11 +40,20 @@ function PostUpload(props) {
     confirm = false;
   }
   const addPost = () => {
-    dispatch(postActions.addPostFB(comment));
+    dispatch(postActions.addPostFB(comment, selectedValue));
   };
   const editPost = () => {
-    dispatch(postActions.editPostFB(post_id, { comment: comment }));
+    dispatch(
+      postActions.editPostFB(post_id, {
+        comment: comment,
+        selectedValue: selectedValue,
+      }),
+    );
   };
+  const handleChange = (e) => {
+    setSelectedValue(e.target.value);
+  };
+
   if (!is_login) {
     window.alert('잘못된 경로입니다');
     history.goBack();
@@ -60,25 +71,92 @@ function PostUpload(props) {
           <br />
           <br />
         </Header>
-        <Img
-          src={
-            preview
-              ? preview
-              : 'https://www.smallwoods.org.uk/assets/Uploads/Documents/ac72cd8e0a/product-default-img__FitMaxWzEwMDAsODAwXQ.jpg'
-          }
-          alt='img'
-        />
-        <TextField
-          label='내용을 입력해주세요.'
-          value={comment}
-          multiline
-          rows={5}
-          variant='outlined'
-          onChange={(e) => {
-            setComment(e.target.value);
-          }}
-        />
-        <br />
+        {selectedValue === 'a' ? (
+          <>
+            <TextField
+              label='내용을 입력해주세요.'
+              value={comment}
+              multiline
+              rows={5}
+              variant='outlined'
+              onChange={(e) => {
+                setComment(e.target.value);
+              }}
+            />
+            <br />
+            <Img
+              src={
+                preview
+                  ? preview
+                  : 'https://www.smallwoods.org.uk/assets/Uploads/Documents/ac72cd8e0a/product-default-img__FitMaxWzEwMDAsODAwXQ.jpg'
+              }
+              alt='img'
+            />
+          </>
+        ) : selectedValue === 'b' ? (
+          <>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+              }}
+            >
+              <TextField
+                label='내용을 입력해주세요.'
+                value={comment}
+                multiline
+                rows={19}
+                variant='outlined'
+                onChange={(e) => {
+                  setComment(e.target.value);
+                }}
+              />
+              <br />
+              <Img
+                src={
+                  preview
+                    ? preview
+                    : 'https://www.smallwoods.org.uk/assets/Uploads/Documents/ac72cd8e0a/product-default-img__FitMaxWzEwMDAsODAwXQ.jpg'
+                }
+                alt='img'
+                style={{ width: '200px', height: '400px' }}
+              />
+            </div>
+          </>
+        ) : selectedValue === 'c' ? (
+          <>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row-reverse',
+                justifyContent: 'center',
+              }}
+            >
+              <TextField
+                label='내용을 입력해주세요.'
+                value={comment}
+                multiline
+                rows={19}
+                variant='outlined'
+                onChange={(e) => {
+                  setComment(e.target.value);
+                }}
+              />
+              <br />
+              <Img
+                src={
+                  preview
+                    ? preview
+                    : 'https://www.smallwoods.org.uk/assets/Uploads/Documents/ac72cd8e0a/product-default-img__FitMaxWzEwMDAsODAwXQ.jpg'
+                }
+                alt='img'
+                style={{ width: '200px', height: '400px' }}
+              />
+            </div>
+          </>
+        ) : null}
+
         {is_edit ? (
           <Button
             variant='contained'
@@ -108,6 +186,29 @@ function PostUpload(props) {
         >
           뒤로가기
         </Button>
+        <p>레이아웃 설정하기</p>
+        <SelectGroup>
+          <Radio
+            checked={selectedValue === 'a'}
+            onChange={handleChange}
+            color='primary'
+            value='a'
+          />
+
+          <Radio
+            checked={selectedValue === 'b'}
+            onChange={handleChange}
+            color='primary'
+            value='b'
+          />
+
+          <Radio
+            checked={selectedValue === 'c'}
+            onChange={handleChange}
+            color='primary'
+            value='c'
+          />
+        </SelectGroup>
       </Container>
     </>
   );
@@ -118,6 +219,10 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   & h1 {
+    text-align: center;
+    color: #af7ac5;
+  }
+  & p {
     text-align: center;
     color: #af7ac5;
   }
@@ -140,5 +245,9 @@ const Img = styled.img`
   @media only screen and (max-width: 375px) {
     height: 300px;
   }
+`;
+const SelectGroup = styled.div`
+  display: flex;
+  justify-content: center;
 `;
 export default PostUpload;

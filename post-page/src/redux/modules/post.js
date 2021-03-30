@@ -121,7 +121,7 @@ const editPostFB = (post_id = null, post = {}) => {
   };
 };
 
-const addPostFB = (comment = '') => {
+const addPostFB = (comment = '', selectedValue = 'a') => {
   return function (dispatch, getState, { history }) {
     const postDB = firestore.collection('post');
     const user = getState().user.user;
@@ -132,6 +132,7 @@ const addPostFB = (comment = '') => {
     const _post = {
       ...initialPost,
       comment: comment,
+      selectedValue: selectedValue,
       insert_dt: moment().format('YYYY-MM-DD HH:mm:ss'),
     };
     const image = getState().image.preview;
