@@ -6,12 +6,19 @@ import { actionCreators as imageActions } from './image';
 
 const ADD_POST = 'ADD_POST';
 const GET_POST = 'GET_POST';
+const LOADING = 'LOADING';
 
 const addPost = createAction(ADD_POST, (post) => ({ post }));
-const getPost = createAction(GET_POST, (post_list) => ({ post_list }));
+const getPost = createAction(GET_POST, (post_list, paging) => ({
+  post_list,
+  paging,
+}));
+const loading = createAction(LOADING, (is_loading) => ({ is_loading }));
 
 const initialState = {
   list: [],
+  paging: { start: null, next: null, size: 3 },
+  is_loading: false,
 };
 
 const initialPost = {
@@ -74,31 +81,77 @@ const addPostFB = (comment = '') => {
     });
   };
 };
-const getPostFB = () => {
+const getPostFB = (start = null, size = 3) => {
+  return function (dispatch, getState, { history }) {
+    let _paging = getState().post.paging;
+    if (_paging.start && !_paging.next) {
+      return;
+    }
+    dispatch(loading(true));
+    const postDB = firestore.collection('post');
+
+    let query = postDB.orderBy('insert_dt', 'desc');
+    if (start) {
+      query = query.startAt(start);
+    }
+
+    query
+      .limit(size + 1)
+      .get()
+      .then((docs) => {
+        let post_list = [];
+        let paging = {
+          start: docs.docs[0],
+          next:
+            docs.docs.length === size + 1
+              ? docs.docs[docs.docs.length - 1]
+              : null,
+          size: size,
+        };
+        docs.forEach((doc) => {
+          let _post = doc.data();
+          let post = Object.keys(_post).reduce(
+            (acc, cur) => {
+              if (cur.indexOf('user_') !== -1) {
+                return {
+                  ...acc,
+                  user_info: { ...acc.user_info, [cur]: _post[cur] },
+                };
+              }
+              return { ...acc, [cur]: _post[cur] };
+            },
+            { id: doc.id, user_info: {} },
+          );
+          post_list.push(post);
+        });
+        // post_list.pop();
+        dispatch(getPost(post_list, paging));
+      });
+  };
+};
+
+const getPostOneFB = (id) => {
   return function (dispatch, getState, { history }) {
     const postDB = firestore.collection('post');
-    postDB.get().then((docs) => {
-      let post_list = [];
-      docs.forEach((doc) => {
-        let _post = {
-          post_id: doc.id,
-          ...doc.data(),
-        };
-        let post = {
-          post_id: doc.id,
-          user_info: {
-            user_name: _post.user_name,
-            user_id: _post.user_id,
+    postDB
+      .doc(id)
+      .get()
+      .then((doc) => {
+        let _post = doc.data();
+        let post = Object.keys(_post).reduce(
+          (acc, cur) => {
+            if (cur.indexOf('user_') !== -1) {
+              return {
+                ...acc,
+                user_info: { ...acc.user_info, [cur]: _post[cur] },
+              };
+            }
+            return { ...acc, [cur]: _post[cur] };
           },
-          image_url: _post.image_url,
-          comment: _post.comment,
-          like: _post.like,
-          insert_dt: _post.insert_dt,
-        };
-        post_list.push(post);
+          { id: doc.id, user_info: {} },
+        );
+        dispatch(getPost([post]));
       });
-      dispatch(getPost(post_list));
-    });
   };
 };
 
@@ -110,7 +163,24 @@ export default handleActions(
       }),
     [GET_POST]: (state, action) =>
       produce(state, (draft) => {
-        draft.list = action.payload.post_list;
+        draft.list.push(...action.payload.post_list);
+        draft.list = draft.list.reduce((acc, cur) => {
+          if (acc.findIndex((val) => val.id === cur.id) === -1) {
+            return [...acc, cur];
+          } else {
+            acc[acc.findIndex((val) => val.id === cur.id)] = cur;
+            return acc;
+          }
+        }, []);
+        if (action.payload.paging) {
+          draft.paging = action.payload.paging;
+        }
+
+        draft.is_loading = false;
+      }),
+    [LOADING]: (state, action) =>
+      produce(state, (draft) => {
+        draft.is_loading = action.payload.is_loading;
       }),
   },
   initialState,
@@ -119,6 +189,7 @@ export default handleActions(
 const actionCreators = {
   addPostFB,
   getPostFB,
+  getPostOneFB,
 };
 
 export { actionCreators };
