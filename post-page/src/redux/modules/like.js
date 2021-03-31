@@ -80,11 +80,12 @@ const unlikeFB = (post_id, user_id) => {
   };
 };
 
-const getLikeFB = (post_id = null, user_id) => {
+const getLikeFB = (post_id = null) => {
   return function (dispatch, getState, { history }) {
     if (!post_id) {
       return;
     }
+
     const likeDB = firestore.collection('like');
     likeDB
       .where('post_id', '==', post_id)
@@ -95,15 +96,6 @@ const getLikeFB = (post_id = null, user_id) => {
           list.push({ ...doc.data(), id: doc.id });
         });
         dispatch(getLike(post_id, list));
-        list.forEach((val) => {
-          if (val.user_id === user_id && val.post_id) {
-            dispatch(isLike(true));
-          } else if (val.user_id === undefined) {
-            dispatch(isLike(false));
-          } else {
-            dispatch(isLike(false));
-          }
-        });
       })
       .catch((e) => {
         console.log(e);
@@ -119,7 +111,8 @@ export default handleActions(
       }),
     [GET_LIKE]: (state, action) =>
       produce(state, (draft) => {
-        draft.list[action.payload.post_id] = action.payload.like_list;
+        draft.list = action.payload.like_list;
+        // draft.list[action.payload.post_id] = action.payload.comment_list;
       }),
   },
   initialState,
@@ -129,6 +122,7 @@ const actionCreators = {
   likeFB,
   unlikeFB,
   getLikeFB,
+  isLike,
 };
 
 export { actionCreators };

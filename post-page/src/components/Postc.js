@@ -21,7 +21,7 @@ function Post(props) {
         </Main>
         <LikeCnt>
           <Permit>
-            <Like />
+            <Like {...props} />
           </Permit>
           좋아요 {props.like} 개
         </LikeCnt>
