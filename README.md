@@ -50,14 +50,4 @@
 
   키를 추가하세요
   }; </code><br/><br/>
-  <code>
-  firebase.initializeApp(firebaseConfig);
-  </code>
-  <br/>
-  <code>
-  const firestore = firebase.firestore();
-  </code>
-  <br/>
-  <code>
-  export { firestore };
-  </code>
+--------- 이후 내용은 파이어베이스 문서를 참고하세요 ------
