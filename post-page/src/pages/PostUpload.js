@@ -224,7 +224,6 @@ const Container = styled.div`
   }
   & p {
     text-align: center;
-    color: #af7ac5;
   }
 
   @media only screen and (max-width: 375px) {

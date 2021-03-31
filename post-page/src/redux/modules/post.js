@@ -83,7 +83,7 @@ const editPostFB = (post_id = null, post = {}) => {
     } else {
       const user_id = getState().user.user.uid;
       const _upload = storage
-        .ref(`image/${user_id}_${new Date().getTime()}`)
+        .ref(`images/${user_id}_${new Date().getTime()}`)
         .putString(_image, 'data_url');
 
       _upload.then((snapshot) => {
@@ -303,6 +303,7 @@ const actionCreators = {
   getPostOneFB,
   editPostFB,
   deletePostFB,
+  editPost,
 };
 
 export { actionCreators };
