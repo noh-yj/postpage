@@ -57,6 +57,7 @@ const unlikeFB = (post_id, user_id) => {
         const user_like = likes.filter((val) => {
           return val.user_id === user_id;
         });
+
         likeDB
           .doc(user_like[0].id)
           .delete()
@@ -112,7 +113,6 @@ export default handleActions(
     [GET_LIKE]: (state, action) =>
       produce(state, (draft) => {
         draft.list = action.payload.like_list;
-        // draft.list[action.payload.post_id] = action.payload.comment_list;
       }),
   },
   initialState,

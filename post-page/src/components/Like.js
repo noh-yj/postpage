@@ -50,8 +50,20 @@ function Like(props) {
           )}
         </IconButton>
       ) : null}
+      {/* {post_url === undefined ? (
+        <Btn>
+          <IconButton style={{ cursor: 'auto' }}>
+            <FavoriteBorderIcon />
+          </IconButton>
+        </Btn>
+      ) : null} */}
     </>
   );
 }
+// const Btn = styled.div`
+//   & Button:hover {
+//     background: #fff;
+//   }
+// `;
 
 export default Like;
