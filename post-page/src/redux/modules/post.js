@@ -26,6 +26,7 @@ const initialState = {
   list: [],
   paging: { start: null, next: null, size: 3 },
   is_loading: false,
+  view_loading: false,
 };
 
 const initialPost = {
@@ -274,6 +275,7 @@ export default handleActions(
         }
 
         draft.is_loading = false;
+        draft.view_loading = true;
       }),
     [EDIT_POST]: (state, action) =>
       produce(state, (draft) => {
