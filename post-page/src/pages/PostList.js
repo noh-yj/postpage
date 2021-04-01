@@ -15,7 +15,6 @@ function PostList(props) {
   const is_loading = useSelector((state) => state.post.is_loading);
   const paging = useSelector((state) => state.post.paging);
   const view_loading = useSelector((state) => state.post.view_loading);
-  console.log(view_loading);
 
   useEffect(() => {
     if (post_list.length < 2) {
